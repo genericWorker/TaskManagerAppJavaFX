@@ -1,0 +1,74 @@
+.priority-urgent {
+    -fx-text-fill: red;
+    -fx-font-weight: bold;
+}
+/* The Main Background */
+.root {
+    -fx-background-color: #f4f7f6;
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+/* Styling the TableView */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-selection-bar: #e3f2fd;
+    -fx-selection-bar-non-focused: #f5f5f5;
+}
+
+.table-view .column-header {
+    -fx-background-color: #37474f;
+    -fx-size: 40px;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+/* Modern Rounded TextFields and DatePickers */
+.text-field, .date-picker, .combo-box {
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-border-color: #cfd8dc;
+    -fx-padding: 5;
+}
+
+.text-field:focused {
+    -fx-border-color: #2196f3;
+}
+
+/* Button Hover Effects */
+.button {
+    -fx-cursor: hand;
+    -fx-background-radius: 5;
+}
+
+.button:hover {
+    -fx-brightness: 0.9;
+}
+
+.button:hover {
+    -fx-opacity: 0.85;
+    -fx-cursor: hand;
+}
+
+/* Make the header background darker to make the light arrow pop */
+.table-view .column-header {
+    -fx-background-color: #2c3e50;
+    -fx-border-color: #34495e;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+/* Make the arrow itself larger and brighter */
+.table-view .sort-order-dot {
+    -fx-background-color: #ecf0f1;
+}
+
+.table-view .arrow {
+    -fx-background-color: #ffffff; /* Bright white arrow */
+    -fx-padding: 4px;             /* Bigger arrow */
+}

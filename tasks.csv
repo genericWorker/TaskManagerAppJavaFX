@@ -1,0 +1,36 @@
+ID,Subject,Priority,Status,StartDate,DueDate
+18,Emergency server maintenance,URGENT,COMPLETED,2026-01-20,2026-01-20
+2,Fix login page bug,URGENT,NOT_STARTED,2026-01-20,2026-01-22
+25,Prepare annual board slides,URGENT,IN_PROGRESS,2026-01-15,2026-01-25
+6,Prepare annual board slides,URGENT,IN_PROGRESS,2026-01-15,2026-01-25
+33,Resolve customer tickets,HIGH,COMPLETED,2026-01-18,2026-01-20
+13,Review security protocols,HIGH,COMPLETED,2026-01-25,2026-01-30
+28,Internal audit review,URGENT,COMPLETED,2026-02-10,2026-02-15
+8,Submit tax documents,URGENT,IN_PROGRESS,2026-01-15,2026-01-31
+9,Client presentation prep,HIGH,NOT_STARTED,2026-01-22,2026-01-24
+21,Renew software licenses,HIGH,NOT_STARTED,2026-01-20,2026-01-26
+34,Team building exercise,NORMAL,NOT_STARTED,2026-02-20,2026-02-20
+12,Social media content plan,NORMAL,COMPLETED,2026-01-01,2026-01-07
+35,Write unit tests for UI,HIGH,IN_PROGRESS,2026-01-20,2026-01-30
+15,Interview candidate John Doe,NORMAL,COMPLETED,2026-01-19,2026-01-19
+17,Quarterly sales report,NORMAL,NOT_STARTED,2026-02-01,2026-02-05
+16,Develop mobile app prototype,HIGH,IN_PROGRESS,2026-01-10,2026-03-01
+5,Draft marketing strategy,URGENT,NOT_STARTED,2026-02-01,2026-02-15
+1,Update quarterly budget,HIGH,IN_PROGRESS,2026-01-05,2026-01-25
+19,Write blog post on productivity,LOW,NOT_STARTED,2026-01-21,NULL
+10,Update employee handbook,NORMAL,NOT_STARTED,2026-01-21,NULL
+11,Database migration,NORMAL,IN_PROGRESS,2026-01-18,2026-01-23
+22,Analyze competitor pricing,NORMAL,IN_PROGRESS,2026-01-15,NULL
+23,Organize charity event,LOW,COMPLETED,2026-03-10,2026-03-20
+30,Verify backup integrity,NORMAL,NOT_STARTED,2026-01-21,2026-01-21
+24,Fix CSS alignment issues,NORMAL,COMPLETED,2026-01-12,2026-01-13
+26,Refactor legacy code,HIGH,NOT_STARTED,2026-02-01,NULL
+27,Testing user feedback loop,NORMAL,IN_PROGRESS,2026-01-10,2026-01-28
+14,Clean up cloud storage,LOW,IN_PROGRESS,2026-01-15,NULL
+29,Holiday party planning,LOW,COMPLETED,2025-12-01,2025-12-15
+7,Order new office chairs,LOW,COMPLETED,2026-01-02,2026-01-10
+31,Update API documentation,NORMAL,IN_PROGRESS,2026-01-05,NULL
+32,Photography for new products,LOW,NOT_STARTED,2026-01-21,2026-01-30
+4,Weekly team sync,NORMAL,COMPLETED,2026-01-14,2026-01-14
+3,Brainstorm new great logo ideas,LOW,COMPLETED,2026-01-19,NULL
+20,Setup new workstation,NORMAL,IN_PROGRESS,2026-01-18,2026-01-18
