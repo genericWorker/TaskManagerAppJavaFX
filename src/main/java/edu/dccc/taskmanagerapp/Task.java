@@ -18,14 +18,21 @@ public class Task implements Comparable<Task>, CSVTemplate {
     private LocalDate dueDate;
 
     // 1. MANDATORY: Default constructor for CSVReaderWriter
-    public Task() {}
+    public Task() {
+        // Initialize with defaults so a "blank" task doesn't crash the UI
+        this.priority = Priority.NORMAL;
+        this.status = TaskStatus.NOT_STARTED;
+    }
 
     // 2. Complete constructor for creating new tasks from the UI
     public Task(int taskId, String subject, Priority priority, TaskStatus status, LocalDate startDate, LocalDate dueDate) {
         this.taskId = taskId;
         this.subject = subject;
-        this.priority = priority;
-        this.status = status;
+
+        // Safety: If UI sends null, don't break the PriorityQueue logic
+        this.priority = (priority == null) ? Priority.NORMAL : priority;
+        this.status = (status == null) ? TaskStatus.NOT_STARTED : status;
+
         this.startDate = startDate;
         this.dueDate = dueDate;
     }
@@ -33,12 +40,16 @@ public class Task implements Comparable<Task>, CSVTemplate {
     // 3. CSVTemplate Implementation: How to save to a string
     @Override
     public String toCSV() {
+        // Convert dates to "NULL" string if they are null, otherwise use standard ISO format
+        String startStr = (this.startDate == null) ? "NULL" : this.startDate.toString();
+        String dueStr = (this.dueDate == null) ? "NULL" : this.dueDate.toString();
+
         return taskId + "," +
                 subject + "," +
                 priority + "," +
                 status + "," +
-                startDate + "," +
-                dueDate;
+                startStr + "," +
+                dueStr;
     }
 
     // 4. CSVTemplate Implementation: How to load from parts
@@ -49,8 +60,11 @@ public class Task implements Comparable<Task>, CSVTemplate {
             this.subject = p[1];
             this.priority = Priority.valueOf(p[2]);
             this.status = TaskStatus.valueOf(p[3]);
-            this.startDate = LocalDate.parse(p[4]);
-            this.dueDate = LocalDate.parse(p[5]);
+
+            // Handle "NULL" strings during loading
+            this.startDate = (p[4].equalsIgnoreCase("NULL")) ? null : LocalDate.parse(p[4]);
+            this.dueDate = (p[5].equalsIgnoreCase("NULL")) ? null : LocalDate.parse(p[5]);
+
         } catch (Exception e) {
             System.err.println("Error parsing task line: " + String.join(",", p));
         }
@@ -74,6 +88,8 @@ public class Task implements Comparable<Task>, CSVTemplate {
 
         return priorityComparison;
     }
+
+
 
     // --- Getters and Setters (Required for TableView PropertyValueFactory) ---
     public int getTaskId() { return taskId; }
