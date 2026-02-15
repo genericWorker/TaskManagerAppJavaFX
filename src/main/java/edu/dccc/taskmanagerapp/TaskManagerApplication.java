@@ -11,7 +11,7 @@ public class TaskManagerApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(TaskManagerApplication.class.getResource("taskmanager-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 920, 640);
+        Scene scene = new Scene(fxmlLoader.load(), 920, 700);
         stage.setTitle("Task Manager");
         stage.setScene(scene);
         stage.show();

@@ -1,12 +1,11 @@
 ID,Subject,Priority,Status,StartDate,DueDate, CompletedDate
 18,Emergency server maintenance,URGENT,NOT_STARTED,2026-01-20,2026-01-20,NULL
-13,Review security protocols,URGENT,IN_PROGRESS,2026-01-25,2026-01-30,NULL
 8,Submit tax documents,URGENT,IN_PROGRESS,2026-01-15,2026-01-31,NULL
 2,Fix login page bug,HIGH,IN_PROGRESS,2026-01-20,2026-01-22,NULL
 9,Client presentation prep,HIGH,NOT_STARTED,2026-01-22,2026-01-24,NULL
+1,Update quarterly budget,HIGH,IN_PROGRESS,2026-01-05,2026-01-25,NULL
 6,Prepare annual board slides,HIGH,IN_PROGRESS,2026-01-15,2026-01-25,NULL
 25,Prepare annual board slides,HIGH,IN_PROGRESS,2026-01-15,2026-01-25,NULL
-1,Update quarterly budget,HIGH,IN_PROGRESS,2026-01-05,2026-01-25,NULL
 21,Renew software licenses,HIGH,NOT_STARTED,2026-01-20,2026-01-26,NULL
 35,Write unit tests for UI,HIGH,IN_PROGRESS,2026-01-20,2026-01-30,NULL
 16,Develop mobile app prototype,HIGH,IN_PROGRESS,2026-01-10,2026-03-01,NULL
@@ -31,5 +30,6 @@ ID,Subject,Priority,Status,StartDate,DueDate, CompletedDate
 23,Organize charity event,LOW,IN_PROGRESS,2026-03-10,2026-03-20,NULL
 14,Clean up cloud storage,LOW,IN_PROGRESS,2026-01-15,NULL,NULL
 19,Write blog post on productivity,LOW,NOT_STARTED,2026-01-21,NULL,NULL
+13,Review security protocols,URGENT,COMPLETED,2026-01-25,2026-01-30,2026-02-15
 28,Internal audit review,HIGH,COMPLETED,2026-02-10,2026-02-15,2026-02-15
 3,Brainstorm new great logo ideas,LOW,COMPLETED,2026-01-19,NULL,2026-02-15
