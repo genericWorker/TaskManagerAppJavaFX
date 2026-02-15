@@ -24,6 +24,7 @@ public class TaskManagerController {
     @FXML private TableColumn<Task, Task.TaskStatus> colStatus;
     @FXML private TableColumn<Task, LocalDate> colStartDate;
     @FXML private TableColumn<Task, LocalDate> colDueDate;
+    @FXML private TableColumn<Task, LocalDate> colCompletedDate;
 
     @FXML private TextField txtSubject;
     @FXML private ComboBox<Task.Priority> comboPriority;
@@ -54,6 +55,7 @@ public class TaskManagerController {
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
         colStartDate.setCellValueFactory(new PropertyValueFactory<>("startDate"));
         colDueDate.setCellValueFactory(new PropertyValueFactory<>("dueDate"));
+        colCompletedDate.setCellValueFactory(new PropertyValueFactory<>("completedDate"));
 
         colPriority.setComparator((p1, p2) -> {
             if (p1 == p2) return 0;
@@ -123,6 +125,7 @@ public class TaskManagerController {
         colStatus.setCellFactory(this::createStatusCell);
         colStartDate.setCellFactory(this::createDateCell);
         colDueDate.setCellFactory(this::createDateCell);
+        colCompletedDate.setCellFactory(this::createDateCell);
     }
 
     // --- REUSABLE FACTORY METHODS (GHOST-PROOF) ---
@@ -188,13 +191,28 @@ public class TaskManagerController {
     // --- CORE LOGIC METHODS ---
 
     private void loadTasks() {
+        // 1. Clear the logic store (PriorityQueue)
         taskQueue.clear();
+
+        // 2. Load from the CSV file
+        // Note: csvService uses Task.fromCSV internally to handle all 7 columns
         csvService.loadFromCSV(true);
-        refreshTableFromQueue();
+
+        // 3. Update the UI pipeline
+        // This moves data: PriorityQueue -> ObservableList -> FilteredList -> TableView
+        refreshTable();
+
+        // 4. Force the initial sort to match our compareTo logic
+        taskTable.getSortOrder().clear();
+        taskTable.getSortOrder().add(colPriority);
+        colPriority.setSortType(TableColumn.SortType.ASCENDING);
+        taskTable.sort();
+
+        updateSystemMessage("Data loaded from " + CSV_FILE, "#2980b9");
     }
 
     private void saveTasksToCSV() {
-        String header = "ID,Subject,Priority,Status,StartDate,DueDate";
+        String header = "ID,Subject,Priority,Status,StartDate,DueDate, CompletedDate";
         csvService.saveToCSVSorted(header);
     }
 
@@ -223,39 +241,80 @@ public class TaskManagerController {
         updateStatistics();
     }
 
+    private int generateNextId() {
+        /* * We stream the queue, map to the IDs, find the maximum,
+         * and add 1. If the queue is empty, we start at 1.
+         */
+        return taskQueue.stream()
+                .mapToInt(Task::getTaskId)
+                .max()
+                .orElse(0) + 1;
+    }
+
     @FXML
     private void handleSave() {
+        // 1. Capture data from UI components
         String subject = txtSubject.getText();
-        if (subject == null || subject.isBlank()) {
-            updateSystemMessage("Error: Subject is required", "#e74c3c");
+        Task.Priority priority = comboPriority.getValue();
+        Task.TaskStatus status = comboStatus.getValue();
+        LocalDate start = dpStart.getValue();
+        LocalDate due = dpDue.getValue();
+
+        // Basic Validation
+        if (subject == null || subject.trim().isEmpty()) {
+            lblSystemMessage.setText("ERROR: Subject is required.");
             return;
         }
 
-        Task selected = taskTable.getSelectionModel().getSelectedItem();
-        String successMessage; // Create a variable to hold the message
-        String color;
 
-        if (selected != null) {
-            taskQueue.remove(selected);
-            selected.setSubject(subject);
-            selected.setPriority(comboPriority.getValue());
-            selected.setStatus(comboStatus.getValue());
-            selected.setStartDate(dpStart.getValue());
-            selected.setDueDate(dpDue.getValue());
-            taskQueue.add(selected);
-            successMessage = "TASK UPDATED";
-            color = "#2980b9";
+
+        // Identify if we are updating an existing selection
+        Task selectedTask = taskTable.getSelectionModel().getSelectedItem();
+
+        if (selectedTask != null) {
+            /*
+             * DATA STRUCTURES LOGIC:
+             * To update an element in a PriorityQueue, we must remove it and re-add it.
+             * If we simply change the fields, the internal Heap structure remains
+             * out of sync because the Queue doesn't know the 'priority' changed.
+             */
+
+            // Step A: Remove the "stale" version from the Heap (O(n))
+            taskQueue.remove(selectedTask);
+
+            // Step B: Update the object properties
+            selectedTask.setSubject(subject);
+            selectedTask.setPriority(priority);
+            selectedTask.setStatus(status); // Logic inside Task.java handles completedDate
+            selectedTask.setStartDate(start);
+            selectedTask.setDueDate(due);
+
+            // Step C: Re-insert to trigger the "sift" process (O(log n))
+            taskQueue.add(selectedTask);
+
+            lblSystemMessage.setText("Task #" + selectedTask.getTaskId() + " updated.");
         } else {
-            int newId = taskQueue.stream().mapToInt(Task::getTaskId).max().orElse(0) + 1;
-            taskQueue.add(new Task(newId, subject, comboPriority.getValue(), comboStatus.getValue(), dpStart.getValue(), dpDue.getValue()));
-            successMessage = "TASK UPDATED";
-            color = "#2980b9";
+            // Create a new task with a unique ID
+            int newId = generateNextId();
 
+            // completedDate is passed as null; setStatus() logic will stamp it if needed
+            Task newTask = new Task(newId, subject, priority, status, start, due, null);
+
+            // Logic inside Task.java constructor or setStatus ensures
+            // that if the user chose "COMPLETED" immediately, a date is generated.
+            if(status == Task.TaskStatus.COMPLETED) {
+                newTask.setCompletedDate(LocalDate.now());
+            }
+
+            taskQueue.add(newTask);
+            lblSystemMessage.setText("New Task #" + newId + " added to queue.");
         }
+
+        // Refresh UI Components
+        refreshTable();     // Synchronizes TableView with PriorityQueue
+        handleClearForm();  // Resets input fields
+        updateStatistics(); // Recalculates progress bar and urgent count
         saveTasksToCSV();
-        refreshTableFromQueue();
-        handleClearForm();
-        updateSystemMessage(successMessage, color);
     }
 
     @FXML
@@ -274,13 +333,21 @@ public class TaskManagerController {
 
     @FXML
     private void refreshTable() {
+        // 1. Sync the ObservableList with the PriorityQueue
+        // This ensures internal changes (like completedDate) are caught
+        taskList.clear();
+        taskList.addAll(taskQueue);
+
+        // 2. Existing Filter Logic
         String searchText = txtSearch.getText().toLowerCase();
         boolean hideDone = chkHideCompleted.isSelected();
+
         filteredData.setPredicate(task -> {
             boolean matchesSearch = task.getSubject().toLowerCase().contains(searchText);
             boolean matchesVisibility = !hideDone || task.getStatus() != Task.TaskStatus.COMPLETED;
             return matchesSearch && matchesVisibility;
         });
+
         updateStatistics();
     }
 

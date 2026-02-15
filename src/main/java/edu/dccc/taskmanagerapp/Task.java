@@ -5,54 +5,64 @@ import java.time.LocalDate;
 
 public class Task implements Comparable<Task>, CSVTemplate {
 
-    // Nested Enums
     public enum Priority { URGENT, HIGH, NORMAL, LOW }
     public enum TaskStatus { NOT_STARTED, IN_PROGRESS, COMPLETED }
 
-    // Fields
     private int taskId;
     private String subject;
     private Priority priority;
     private TaskStatus status;
     private LocalDate startDate;
     private LocalDate dueDate;
+    private LocalDate completedDate; // New Field
 
-    // 1. MANDATORY: Default constructor for CSVReaderWriter
     public Task() {
-        // Initialize with defaults so a "blank" task doesn't crash the UI
         this.priority = Priority.NORMAL;
         this.status = TaskStatus.NOT_STARTED;
     }
 
-    // 2. Complete constructor for creating new tasks from the UI
-    public Task(int taskId, String subject, Priority priority, TaskStatus status, LocalDate startDate, LocalDate dueDate) {
+  public Task(int taskId, String subject, Priority priority, TaskStatus status,
+                LocalDate startDate, LocalDate dueDate, LocalDate completedDate) {
         this.taskId = taskId;
         this.subject = subject;
-
-        // Safety: If UI sends null, don't break the PriorityQueue logic
         this.priority = (priority == null) ? Priority.NORMAL : priority;
         this.status = (status == null) ? TaskStatus.NOT_STARTED : status;
-
         this.startDate = startDate;
         this.dueDate = dueDate;
+        this.completedDate = completedDate;
     }
 
-    // 3. CSVTemplate Implementation: How to save to a string
+    public Task(int taskId, String subject, Priority priority, LocalDate start, LocalDate due) {
+        // New tasks always start as NOT_STARTED and have no completedDate yet.
+        this(taskId, subject, priority, TaskStatus.NOT_STARTED, start, due, null);
+    }
+
+    @Override
+    public int compareTo(Task other) {
+        // TODO: Students implement priority-based sorting here.
+        // Logic: COMPLETED tasks usually sink to the bottom regardless of priority.
+        if (this.status == TaskStatus.COMPLETED && other.status != TaskStatus.COMPLETED) return 1;
+        if (this.status != TaskStatus.COMPLETED && other.status == TaskStatus.COMPLETED) return -1;
+
+        int priorityComparison = this.priority.compareTo(other.getPriority());
+        if (priorityComparison == 0) {
+            if (this.dueDate == null) return 1;
+            if (other.dueDate == null) return -1;
+            return this.dueDate.compareTo(other.dueDate);
+        }
+        return priorityComparison;
+    }
+
     @Override
     public String toCSV() {
-        // Convert dates to "NULL" string if they are null, otherwise use standard ISO format
         String startStr = (this.startDate == null) ? "NULL" : this.startDate.toString();
         String dueStr = (this.dueDate == null) ? "NULL" : this.dueDate.toString();
+        String compStr = (this.completedDate == null) ? "NULL" : this.completedDate.toString();
 
-        return taskId + "," +
-                subject + "," +
-                priority + "," +
-                status + "," +
-                startStr + "," +
-                dueStr;
+        return taskId + "," + subject + "," + priority + "," + status + "," +
+                startStr + "," + dueStr + "," + compStr;
     }
 
-    // 4. CSVTemplate Implementation: How to load from parts
     @Override
     public void fromCSV(String[] p) {
         try {
@@ -60,37 +70,17 @@ public class Task implements Comparable<Task>, CSVTemplate {
             this.subject = p[1];
             this.priority = Priority.valueOf(p[2]);
             this.status = TaskStatus.valueOf(p[3]);
-
-            // Handle "NULL" strings during loading
             this.startDate = (p[4].equalsIgnoreCase("NULL")) ? null : LocalDate.parse(p[4]);
             this.dueDate = (p[5].equalsIgnoreCase("NULL")) ? null : LocalDate.parse(p[5]);
-
+            this.completedDate = (p[6].equalsIgnoreCase("NULL")) ? null : LocalDate.parse(p[6]);
         } catch (Exception e) {
             System.err.println("Error parsing task line: " + String.join(",", p));
         }
     }
 
-    // 5. Comparable Implementation: How the PriorityQueue decides who is first
-    @Override
-    public int compareTo(Task other) {
-        // 1. Primary Sort: Priority (URGENT -> HIGH -> NORMAL -> LOW)
-        int priorityComparison = this.priority.compareTo(other.getPriority());
-
-        // 2. Secondary Sort: If priorities are equal, sort by Due Date
-        if (priorityComparison == 0) {
-            // Handle null dates (TBD) safely
-            if (this.dueDate == null && other.dueDate == null) return 0;
-            if (this.dueDate == null) return 1;  // This task moves down
-            if (other.dueDate == null) return -1; // Other task moves down
-
-            return this.dueDate.compareTo(other.dueDate);
-        }
-
-        return priorityComparison;
-    }
-
-
-
+    // --- Getters and Setters ---
+    // Note: In setStatus, students should logic-check if status == COMPLETED
+    // then set completedDate = LocalDate.now()
     // --- Getters and Setters (Required for TableView PropertyValueFactory) ---
     public int getTaskId() { return taskId; }
     public void setTaskId(int taskId) { this.taskId = taskId; }
@@ -102,13 +92,29 @@ public class Task implements Comparable<Task>, CSVTemplate {
     public void setPriority(Priority priority) { this.priority = priority; }
 
     public TaskStatus getStatus() { return status; }
-    public void setStatus(TaskStatus status) { this.status = status; }
+
+    public void setStatus(TaskStatus status) {
+        this.status = status;
+        // Logic: If moving to COMPLETED, stamp the date.
+        // If moving AWAY from COMPLETED, clear the date.
+        if (status == TaskStatus.COMPLETED) {
+            this.completedDate = LocalDate.now();
+        } else {
+            this.completedDate = null;
+        }
+    }
+
+    public LocalDate getCompletedDate() { return completedDate; }
 
     public LocalDate getStartDate() { return startDate; }
     public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
 
     public LocalDate getDueDate() { return dueDate; }
     public void setDueDate(LocalDate dueDate) { this.dueDate = dueDate; }
+
+    public void setCompletedDate(LocalDate completedDate) {
+        this.completedDate = completedDate;
+    }
 
     @Override
     public String toString() {

@@ -54,6 +54,7 @@
                     <TableColumn fx:id="colStatus" prefWidth="120.0" text="Status" />
                     <TableColumn fx:id="colStartDate" prefWidth="110.0" text="Start Date" />
                     <TableColumn fx:id="colDueDate" prefWidth="110.0" text="Due Date" />
+                    <TableColumn fx:id="colCompletedDate" prefWidth="110.0" text="Completed" />
                 </columns>
                 <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY" /></columnResizePolicy>
             </TableView>
