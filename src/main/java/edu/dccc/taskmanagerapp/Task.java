@@ -58,7 +58,8 @@ public class Task implements Comparable<Task>, CSVTemplate {
          * 3. Edge Cases: Handle null due dates (e.g., tasks without dates go to the bottom).
          */
         int priorityComparison = this.priority.compareTo(other.getPriority());
-        //  Check due dates here. Just like completed.
+        //  This is secondary sort when priorities are equal
+
 
         return priorityComparison;
     }
